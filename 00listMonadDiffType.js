@@ -4,7 +4,7 @@
 // map
 // (a -> b) -> ma -> mb
 
-// Kleisli,  monadisches compose (.)
+// fish (monadic .)
 // (a->[]b) -> (b->[]c) -> a -> []c
 const fish = (f, g) => x => f(x).bind(g)
 
@@ -36,12 +36,14 @@ const n2ns = n => Array.from({length: n}, (v,i) => i+1 )
 
 
 // with fish
+// (a->[]b) -> (c->[]d) -> a -> []d
 const c2ns = fish(x => c2cs(x),
              fish(y => n2ns(s2n(y)),
              of))
 console.log(c2ns("c"))
 
 // with bind
+// []a -> (b -> []c) -> []c
 const ns = c2cs("c").bind( y =>
            n2ns(s2n(y)).bind(
            of))
