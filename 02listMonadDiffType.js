@@ -6,12 +6,12 @@ function composeK (f, g) { return function (x) { return f(x).then(g)  }  }
 // Array Monad
 // -----------
 
-// Thought, I misstook types:
+// Initially I misstook types
 // (a->[b]) -> (c->[d]) -> a -> [d]
 // instead of
 // (a->[b]) -> (b->[c]) -> a -> [c]
 
-// Then was surprised to have to do type conversion
+// and was surprised to have to do type conversion
 const composed = composeK(a => c2cs(a)
                 , composeK(b => n2ns(   s2n(b)  )   // s2n the type conversion
                 , x => of(x) ))   
@@ -25,7 +25,7 @@ const ns = c2cs("c").then( a =>
             of(y)))
 console.log(ns)
 
-// And finally realised, that (_->[b]) -> (c->_) is not possible with
+// Finally realised, that (_->[b]) -> (c->_) is not possible with
 // polymrophic composeK / then. It would only be possible with e.g.:
 // comoposeKChar2Int.
 // The "typ conversion" is even reqired in the x->[y] Kleisli arrows.
