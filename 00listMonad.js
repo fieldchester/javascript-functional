@@ -71,6 +71,7 @@ Array.prototype.flatten = function() {
 function of(a) { return Array.of(a) }
 
 // >>=, then, bind() exists already in JS
+// mb -> (b->mc) -> mc
 Array.prototype.then = function(f) {
     return this.map(f).flatten()
 }
@@ -98,7 +99,8 @@ console.log([ 'b', 'c', 'd', 'e' ].then(x =>
 
 const composed = composeK(x =>
         n2ns(x), composeK(y =>
-        of(isEven(y)), x=>of(x)))
+        of(s2n(y)), composeK(z =>
+        of(isEven(z)), u=>of(u))))
 
 console.log(composed(4))
 
@@ -109,10 +111,11 @@ console.log(composed(4))
 // s2n :: String -> Int
 function s2n(s) { return parseInt(s, 36) - 9 }
 // number to String
+// n2s :: a -> mb
 // n2s :: Int -> [Char]
 function n2s(n) { return String.fromCharCode(97+n) }
 // Number to list of Numbers
 // 2 -> [1, 2]
 function n2ns (n) { return Array.from({length: n}, (v,i) => i+1 ) }
-// even
+// isEven :: Int -> Bool
 function isEven(x) {return x % 2 === 0}
