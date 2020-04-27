@@ -14,25 +14,18 @@ function composeK (f, g) { return function (x) { return f(x).then(g)  }  }
 
 
 
-// I use VSCode und Quokka (shows console.log's directly in Editor)
+// I use VSCode und Quokka (shows console.logs directly in Editor)
 
-
-// with composeK
-// (a->[]b) -> (c->[]d) -> a -> []d
-// const c2ns = composeK(x =>
-//     c2cs(x), composeK(y =>
-//     n2ns(s2n(y)) , z => of(z))))
-
-const c2ns = composeK(a =>
+const composed = composeK(a =>
     c2cs(a), composeK(b =>
     n2ns(   s2n(b)  ), x => of(x) ))    // s2n the type conversion
 
-console.log(c2ns("c"))
+console.log(composed("c"))
 
 // with bind
 // []a -> (b -> []c) -> []c
-const ns = c2cs("c").then( x =>
-            n2ns(   s2n(x)  ).then(y =>   // s2n the type conversion
+const ns = c2cs("c").then( a =>
+            n2ns(   s2n(a)  ).then(y =>   // s2n the type conversion
             of(y)))
 console.log(ns)
 
