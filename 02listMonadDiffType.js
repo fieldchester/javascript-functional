@@ -1,7 +1,10 @@
 Array.prototype.flatten = function() { return this.reduce((acc, x) => acc.concat(x), [] )}
 function of(a) { return Array.of(a) }
-Array.prototype.then = function(f) { return this.map(f).flatten() }
-function composeK (f, g) { return function (x) { return f(x).then(g)  }  }
+Array.prototype.chain = function(f) { return this.map(f).flatten() }
+// Array.prototype.chain = function (f) { return this.reduce( (acc, x) => acc.concat(f(x)), []) }
+Array.prototype.skip = function (b) { return this.length === 0 ? [] : this.reduce( (acc) => acc.concat(b), []) }
+function composeK (f, g) { return function (x) { return f(x).chain(g)  }  }
+
 
 // Array Monad
 // -----------
@@ -20,13 +23,13 @@ console.log(composed("c"))
 
 // with bind
 // []a -> (b -> []c) -> []c
-const ns = c2cs("c").then( a =>
-            n2ns(   s2n(a)  ).then(y =>   // s2n the type conversion
+const ns = c2cs("c").chain( a =>
+            n2ns(   s2n(a)  ).chain(y =>   // s2n the type conversion
             of(y)))
 console.log(ns)
 
-// Finally realised, that (_->[b]) -> (c->_) is not possible with
-// polymrophic composeK / then. It would only be possible with e.g.:
+// And finally realised, that (_->[b]) -> (c->_) is not possible with
+// polymrophic composeK / chain. It would only be possible with e.g.:
 // comoposeKChar2Int.
 // The "typ conversion" is even reqired in the x->[y] Kleisli arrows.
 
