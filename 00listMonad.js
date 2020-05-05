@@ -45,12 +45,12 @@ function Id (x) { return x }
 //     return
 //     If we have b->c instead of b->mc
         
-//     mb >>= (b->c) -> (b->mc)
-//              f
-//     mb >>= \b -> let c = f b ;
-//                  mc = return c
-//                  in  mc
-//     return :: c -> mc
+//     (b->c) -> ? -> (b->mc)
+//       f   *   ?
+//     f * ? = \b -> let c = f b
+//                   in mc = ? c
+//     ? = c->mc
+//     ? = return
 
 //     mc = mb >>= \b -> return $ f b
 //     and
@@ -70,37 +70,51 @@ Array.prototype.flatten = function() {
 // a -> [a]
 function of(a) { return Array.of(a) }
 
-// >>=, then, bind() exists already in JS
-// mb -> (b->mc) -> mc
-Array.prototype.then = function(f) {
+// >>=, chain, bind() exists already in JS, then() differs from a monad
+// [b] -> (b->[c]) -> [c]
+Array.prototype.chain = function(f) {
     return this.map(f).flatten()
 }
+// Array.prototype.chain = function (f) {
+//     return this.reduce(
+//         (acc, x) => acc.concat(f(x)), [])
+// }
+
+// >>
+// [a] -> [b] -> [b]
+Array.prototype.skip = function (b) {
+    return this.length === 0 ?
+        [] :
+        this.reduce(
+            (acc) => acc.concat(b), [])
+}
+
 
 // >=>
 // (a->[b]) -> (b->[c]) -> a -> [c]
 function composeK (f, g) {
     return function (x) {
-        return f(x).then(g)
+        return f(x).chain(g)
     }
 }
 
 
 console.log([1,2,3,4].map(x => of(x)).flatten())
 
-console.log([1,2,3,4].then(x => of(x)))
+console.log([1,2,3,4].chain(x => of(x)))
 
-console.log([1,2,3,4].then(x => of(x*x)))
+console.log([1,2,3,4].chain(x => of(x*x)))
 
-console.log([1,2,3,4].then(x => of(n2s(x))))
+console.log([1,2,3,4].chain(x => of(n2s(x))))
 
-console.log([ 'b', 'c', 'd', 'e' ].then(x =>
-                        of(s2n(x))).then(y =>
-                        of(isEven(y))))
+console.log([ 'b', 'c', 'd', 'e' ].chain(c =>
+                        of(s2n(c))).chain(n =>
+                        of(isEven(n))))
 
-const composed = composeK(x =>
-        n2ns(x), composeK(y =>
-        of(s2n(y)), composeK(z =>
-        of(isEven(z)), u=>of(u))))
+const composed = composeK(n =>
+        n2ns(n), composeK(m =>
+        of(n2s(m)), composeK(c =>
+        of(isEven(c)), b=>of(b))))
 
 console.log(composed(4))
 
